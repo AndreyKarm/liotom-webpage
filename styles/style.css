@@ -12,17 +12,23 @@ html {
 }
 
 body {
-    background-image: url(./media/cat.jpg);
+    background-image: url(../media/cat.jpg);
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-div {
-    padding: 1em;
-    margin: 1em;
-    background-color: grey;
-    border-radius: 1em;
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#cmd {
+    color: white;
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 #cmd::after {
