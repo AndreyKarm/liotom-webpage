@@ -1,11 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    if (localStorage.getItem("first") == null) {
-        window.location.href = "pages/loading.html";
-        localStorage.setItem("first", "true");
-    }
-});
-
-document.addEventListener("DOMContentLoaded", function() {
     const textDiv = document.getElementById("cmd");
     const originalHTML = textDiv.innerHTML;
     textDiv.innerHTML = "";
