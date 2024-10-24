@@ -22,4 +22,4 @@ jobs:
 
       - name: Copy files to the server
         run: |
-          sudo scp -i ~/.ssh/id_rsa -r ./liotom-webpage/* ubuntu@138.2.171.77:/var/www/liotom/liotom-webpage
+          sudo scp -o StrictHostKeyChecking=no -r ./liotom-webpage/* ubuntu@138.2.171.77:/var/www/liotom/liotom-webpage
