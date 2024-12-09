@@ -31,11 +31,8 @@ jobs:
     # Upload the code to the live server via SSH
     - name: Deploy to Server
       run: |
+        # Using -T to avoid allocating a pseudo-terminal
         ssh -T ubuntu@89.168.107.188 << 'EOF'
-          # Mark the directory as safe for Git
-          git config --global --add safe.directory /websites/liotom
-          
-          # Pull the latest changes from the repository
           cd /websites/liotom
           git pull origin main  # Pull the latest changes
         EOF
