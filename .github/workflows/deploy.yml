@@ -1,26 +1,32 @@
-name: Deploy to Server
+name: Deploy to Live Server
 
+# Trigger the workflow when code is pushed to the main branch
 on:
   push:
     branches:
-      - main  # Trigger deployment on pushes to the main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 152.70.18.93 >> ~/.ssh/known_hosts
+    # Set up SSH key to access the server
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 89.168.107.188 >> ~/.ssh/known_hosts
 
-      - name: Copy files to the server
-        run: |
-          sudo -i
-          scp -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" -r ./* ubuntu@152.70.18.93:/var/www/liotom/liotom-webpage
+    # Upload the code to the live server via SSH
+    - name: Deploy to Server
+      run: |
+        ssh ubuntu@89.168.107.188 << 'EOF'
+          cd /websites/liotom
+          git pull origin main  # Pull the latest changes
+        EOF
