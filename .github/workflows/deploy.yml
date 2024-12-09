@@ -26,7 +26,8 @@ jobs:
     # Upload the code to the live server via SSH
     - name: Deploy to Server
       run: |
-        ssh ubuntu@89.168.107.188 << 'EOF'
+        # Using -T to avoid allocating a pseudo-terminal
+        ssh -T -o StrictHostKeyChecking=no ubuntu@89.168.107.188 << 'EOF'
           cd /websites/liotom
           git pull origin main  # Pull the latest changes
         EOF
