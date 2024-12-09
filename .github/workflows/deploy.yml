@@ -18,16 +18,24 @@ jobs:
     # Set up SSH key to access the server
     - name: Set up SSH
       run: |
+        # Start SSH agent
+        eval $(ssh-agent -s)
+        
+        # Add the private key to the SSH agent
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh-add -
+
+        # Add the server to known hosts to avoid prompts
         mkdir -p ~/.ssh
-        echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 89.168.107.188 >> ~/.ssh/known_hosts
 
     # Upload the code to the live server via SSH
     - name: Deploy to Server
       run: |
-        # Using -T to avoid allocating a pseudo-terminal
-        ssh -T -o StrictHostKeyChecking=no ubuntu@89.168.107.188 << 'EOF'
+        ssh -T ubuntu@89.168.107.188 << 'EOF'
+          # Mark the directory as safe for Git
+          git config --global --add safe.directory /websites/liotom
+          
+          # Pull the latest changes from the repository
           cd /websites/liotom
           git pull origin main  # Pull the latest changes
         EOF
