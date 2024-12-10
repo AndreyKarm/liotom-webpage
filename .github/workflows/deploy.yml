@@ -1,4 +1,4 @@
-name: Deploy to Live Server
+name: Pull Latest Code
 
 # Trigger the workflow when code is pushed to the main branch
 on:
@@ -7,14 +7,10 @@ on:
       - main
 
 jobs:
-  deploy:
+  pull:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository code
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     # Set up SSH key to access the server
     - name: Set up SSH
       run: |
@@ -22,17 +18,14 @@ jobs:
         eval $(ssh-agent -s)
         
         # Add the private key to the SSH agent
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh-add -
-
+        echo "${{ secrets.PRIVATE_KEY }}" | ssh-add -
         # Add the server to known hosts to avoid prompts
         mkdir -p ~/.ssh
         ssh-keyscan -H 89.168.107.188 >> ~/.ssh/known_hosts
-
-    # Upload the code to the live server via SSH
-    - name: Deploy to Server
+    # Pull the latest code on the live server via SSH
+    - name: Pull Latest Code
       run: |
-        # Using -T to avoid allocating a pseudo-terminal
         ssh -T ubuntu@89.168.107.188 << 'EOF'
-          cd /websites/liotom
-          git pull origin main  # Pull the latest changes
+          cd /var/www/websites/liotom
+          git pull origin main
         EOF
