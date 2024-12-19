@@ -7,32 +7,27 @@ on:
 
 jobs:
   deploy:
-    # Explicitly specifying the Ubuntu version for clarity
     runs-on: ubuntu-24.04
 
     steps:
-    # Check out the code
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Set up SSH for deployment
     - name: Set up SSH
       run: |
-        # Start SSH agent
         eval $(ssh-agent -s)
-
-        # Add the private key from GitHub Secrets
         echo "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-
-        # Add the server to known hosts to avoid prompts
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
         ssh-keyscan -H 89.168.107.188 >> ~/.ssh/known_hosts
 
-    # Deploy: Pull latest code from GitHub to the server
+    - name: Test SSH Connection
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@89.168.107.188 "echo 'SSH Connection Successful'"
+
     - name: Deploy Latest Code
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@89.168.107.188 << 'EOF'
-          cd /var/www/websites/liotom
-          git pull origin main
+        ssh -v -o StrictHostKeyChecking=no ubuntu@89.168.107.188 << 'EOF'
+          cd /var/www/websites/liotom || exit 1
+          git pull origin main || echo "Error in git pull"
         EOF
