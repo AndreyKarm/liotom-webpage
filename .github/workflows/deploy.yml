@@ -7,7 +7,8 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Explicitly specifying the Ubuntu version for clarity
+    runs-on: ubuntu-24.04
 
     steps:
     # Check out the code
@@ -19,18 +20,19 @@ jobs:
       run: |
         # Start SSH agent
         eval $(ssh-agent -s)
-        
+
         # Add the private key from GitHub Secrets
         echo "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
 
         # Add the server to known hosts to avoid prompts
         mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
         ssh-keyscan -H 89.168.107.188 >> ~/.ssh/known_hosts
 
     # Deploy: Pull latest code from GitHub to the server
     - name: Deploy Latest Code
       run: |
-        ssh ubuntu@89.168.107.188 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ubuntu@89.168.107.188 << 'EOF'
           cd /var/www/websites/liotom
           git pull origin main
         EOF
