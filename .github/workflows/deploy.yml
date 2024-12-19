@@ -1,31 +1,36 @@
 name: Pull Latest Code
 
-# Trigger the workflow when code is pushed to the main branch
 on:
   push:
     branches:
       - main
 
 jobs:
-  pull:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # Set up SSH key to access the server
+    # Check out the code
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Set up SSH for deployment
     - name: Set up SSH
       run: |
         # Start SSH agent
         eval $(ssh-agent -s)
         
-        # Add the private key to the SSH agent
-        echo "${{ secrets.PRIVATE_KEY }}" | ssh-add -
+        # Add the private key from GitHub Secrets
+        echo "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+
         # Add the server to known hosts to avoid prompts
         mkdir -p ~/.ssh
         ssh-keyscan -H 89.168.107.188 >> ~/.ssh/known_hosts
-    # Pull the latest code on the live server via SSH
-    - name: Pull Latest Code
+
+    # Deploy: Pull latest code from GitHub to the server
+    - name: Deploy Latest Code
       run: |
-        ssh -T ubuntu@89.168.107.188 << 'EOF'
+        ssh ubuntu@89.168.107.188 << 'EOF'
           cd /var/www/websites/liotom
           git pull origin main
         EOF
